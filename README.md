@@ -1,51 +1,46 @@
 # Quantized Retail Recommender
 
-[![Built with askThili](https://ask.thili.ai/api/v1/public/projects/sr9f4ajnrd/badge.svg)](https://ask.thili.ai/b/sr9f4ajnrd)
+A reproducible retail recommendation demo: generate synthetic shopping baskets, train a compact next-item predictor, probe frequent item pairs, and compare FP32, dynamic INT8, and static INT8 post-training quantization.
 
-This project develops a smart retail recommender that learns from shopping basket data to suggest frequently bought items. You will then apply quantization techniques to significantly reduce the model's size, making it suitable for deployment on resource-constrained devices or for faster loading times.
+## Features
+- Synthetic transactions with reproducible co-purchase patterns.
+- Compact PyTorch next-item prediction from basket prefixes.
+- Top-k recommendations that exclude items already in the basket.
+- Frequent item-pair probing using transaction support.
+- Baseline model size and held-out next-item accuracy.
+- Dynamic and static post-training INT8 quantization.
+- Streamlit dashboard, pytest suite, Dockerfile, and GitHub Actions CI.
 
-## What you are building
-
-**Goal.** You will build a smart retail recommender that identifies frequently bought items, then shrink its model using quantization to reduce its footprint for edge device deployment or faster loading.
-
-**Done when.** You'll know you're done when you have trained a language model on shopping baskets for next-item prediction, applied post-training quantization to the model's weights, and demonstrated a smaller, functional recommendation model.
-
-## Milestones
-
-Tick these off as you go, and commit after each one.
-
-- [ ] **1. Prepare synthetic shopping basket data for training**  
-      Hint: Use data generation techniques to create your synthetic shopping basket dataset.
-- [ ] **2. Continue pretraining a small LM on the basket data**  
-      Hint: Apply language model pretraining techniques from 'Teach a Language Model What Sells Together' to your basket data.
-- [ ] **3. Implement next-item prediction and itemset probing**  
-      Hint: Utilize the trained LM for next-item prediction and itemset recovery as shown in 'Teach a Language Model What Sells Together'.
-- [ ] **4. Measure the baseline size and accuracy of the model**  
-      Hint: Calculate the model's memory footprint and evaluate its recommendation accuracy before quantization.
-- [ ] **5. Apply dynamic and static post-training quantization to the model**  
-      Hint: Implement post-training quantization methods, dynamic and static, as covered in 'Shrink a Neural Network with Quantisation'.
-- [ ] **6. Demonstrate size reduction and evaluate accuracy impact**  
-      Hint: Compare the size and accuracy of your quantized models against the baseline.
-
-## Run it
-
-You need Python 3.12 and git.
-
+## Quick start
+Python 3.12 is recommended.
 ```bash
-python3.12 -m venv .venv && source .venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\\Scripts\\activate
 pip install -r requirements.txt
-cp .env.example .env        # then choose a model; see the comments inside
 streamlit run app/main.py
-pytest
+```
+Run automated tests with `pytest -q`.
+
+## Method
+1. Generate synthetic baskets from common shopping themes.
+2. Convert each basket into prefix-context / next-item training examples.
+3. Train a small feed-forward PyTorch predictor.
+4. Evaluate the baseline and apply dynamic and calibrated static INT8 quantization.
+5. Compare serialized state-dict sizes and next-item accuracy.
+6. Rank frequent item pairs by support.
+
+## Project layout
+```text
+app/core.py       data generation, training, evaluation, quantization
+app/main.py       Streamlit dashboard
+tests/            automated tests
+.github/workflows/ci.yml
+Dockerfile
+requirements.txt
 ```
 
-Your work goes in `app/core.py` (one stub per milestone) and `tests/test_core.py`. The first tests pass already; they check the plumbing.
+## Limitations
+The data is synthetic and intended as an educational baseline, not production demand forecasting. The model is a compact next-item predictor over basket-prefix features, not a pretrained general-purpose language model. For real use, replace synthetic transactions with properly licensed data and evaluate on a chronological holdout. Quantized inference support varies by PyTorch version and CPU backend.
 
-## Settings and secrets
-
-Model settings live in `.env`, which is ignored by git. **Never commit `.env` or paste a key into code.** If a key ever reaches GitHub, treat it as leaked and make a new one.
-
-## Stretch ideas
-
-- Explore further quantization methods beyond dynamic and static, such as quantization-aware training.
-- Analyze the performance impact of the quantized model in terms of inference speed or memory usage on a simulated edge device.
+## Security
+No API keys are needed. Never commit secrets, customer transaction data, or personally identifiable information.
