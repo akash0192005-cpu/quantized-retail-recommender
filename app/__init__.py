@@ -1,0 +1,1 @@
+"""Quantized retail recommender."""
